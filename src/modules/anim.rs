@@ -42,7 +42,7 @@ pub(crate) fn handle_nuanmb_load(path: String, data: Vec<u8>) {
             let table2_idx = table1[*table1_idx as usize].table2_index;
             let table2_entry = table2.get_mut(table2_idx as usize).expect("Table1Entry held invalid Table2 index");
             let ref_cnt = table2_entry.ref_count.load(Ordering::Acquire);
-            assert!(table2_entry.data.is_null() && ref_cnt == 0 && table2_entry.state == 0 && !table2_entry.is_used, "Reloaded custom file while previous is still loaded.");
+            assert!(table2_entry.data.is_null(), "Reloaded custom file while previous is still loaded.");
             table2_entry.data = memcpy_file_data(&data);
             table2_entry.ref_count.fetch_add(1, Ordering::AcqRel);
             table2_entry.state = 3;

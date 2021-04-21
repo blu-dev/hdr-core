@@ -419,7 +419,7 @@ impl ParamModule {
                 agent_float: None,
                 agent_flag: None
             };
-            if category == *smash::lib::lua_const::BATTLE_OBJECT_CATEGORY_FIGHTER {
+            if category == *smash::lib::lua_const::BATTLE_OBJECT_CATEGORY_FIGHTER && !cfg!(feature = "no_common_params") {
                 let int = COMMON_INT.read();
                 let int64 = COMMON_INT64.read();
                 let float = COMMON_FLOAT.read();
