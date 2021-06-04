@@ -26,4 +26,6 @@ pub fn init() {
     modules::init();
     singletons::init();
     fs::init();
+    skyline::nro::add_hook(nro_hook);
+    skyline::nro::add_unload_hook(nro_unhook);
 }
