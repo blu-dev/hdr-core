@@ -165,6 +165,146 @@ impl VarModule {
         }
     }
 
+    fn _add_int(&mut self, what: i32, val: i32) {
+        if what & 0x1000 != 0 {
+            let what = what & 0xFFF;
+            self.fighter_int[what as usize] += val;
+        } else {
+            let what = what & 0xFFF;
+            self.common_int[what as usize] += val;
+        }
+    }
+    fn _sub_int(&mut self, what: i32, val: i32) {
+        if what & 0x1000 != 0 {
+            let what = what & 0xFFF;
+            self.fighter_int[what as usize] -= val;
+        } else {
+            let what = what & 0xFFF;
+            self.common_int[what as usize] -= val;
+        }
+    }
+
+    fn _add_float(&mut self, what: i32, val: f32) {
+        if what & 0x1000 != 0 {
+            let what = what & 0xFFF;
+            self.fighter_float[what as usize] += val;
+        } else {
+            let what = what & 0xFFF;
+            self.common_float[what as usize]  += val;
+        }
+    }
+    fn _sub_float(&mut self, what: i32, val: f32) {
+        if what & 0x1000 != 0 {
+            let what = what & 0xFFF;
+            self.fighter_float[what as usize] -= val;
+        } else {
+            let what = what & 0xFFF;
+            self.common_float[what as usize] -= val;
+        }
+    }
+
+    fn _set_vec2(&mut self, what: i32, vec: &smash::phx::Vector2f) {
+        assert!((what & 0xFFF) + 1 < 0x1000);
+        if what & 0x1000 != 0 {
+            let what = (what & 0xFFF) as usize;
+            self.fighter_float[what + 0] = vec.x;
+            self.fighter_float[what + 1] = vec.y;
+        } else {
+            let what = (what & 0xFFF) as usize;
+            self.common_float[what + 0] = vec.x;
+            self.common_float[what + 1] = vec.y;
+        }
+    }
+
+    fn _set_vec3(&mut self, what: i32, vec: &smash::phx::Vector3f) {
+        assert!((what & 0xFFF) + 2 < 0x1000);
+        if what & 0x1000 != 0 {
+            let what = (what & 0xFFF) as usize;
+            self.fighter_float[what + 0] = vec.x;
+            self.fighter_float[what + 1] = vec.y;
+            self.fighter_float[what + 2] = vec.z;
+        } else {
+            let what = (what & 0xFFF) as usize;
+            self.common_float[what + 0] = vec.x;
+            self.common_float[what + 1] = vec.y;
+            self.common_float[what + 2] = vec.z;
+        }
+    }
+
+    fn _set_vec4(&mut self, what: i32, vec: &smash::phx::Vector4f) {
+        assert!((what & 0xFFF) + 3 < 0x1000);
+        if what & 0x1000 != 0 {
+            let what = (what & 0xFFF) as usize;
+            self.fighter_float[what + 0] = vec.x;
+            self.fighter_float[what + 1] = vec.y;
+            self.fighter_float[what + 2] = vec.z;
+            self.fighter_float[what + 3] = vec.w;
+        } else {
+            let what = (what & 0xFFF) as usize;
+            self.common_float[what + 0] = vec.x;
+            self.common_float[what + 1] = vec.y;
+            self.common_float[what + 2] = vec.z;
+            self.common_float[what + 3] = vec.w;
+        }
+    }
+
+    fn _get_vec2(&self, what: i32) -> smash::phx::Vector2f {
+        assert!((what & 0xFFF) + 1 < 0x1000);
+        if what & 0x1000 != 0 {
+            let what = (what & 0xFFF) as usize;
+            smash::phx::Vector2f {
+                x: self.fighter_float[what + 0],
+                y: self.fighter_float[what + 1]
+            }
+        } else {
+            let what = (what & 0xFFF) as usize;
+            smash::phx::Vector2f {
+                x: self.common_float[what + 0],
+                y: self.common_float[what + 1]
+            }
+        }
+    }
+
+    fn _get_vec3(&self, what: i32) -> smash::phx::Vector3f {
+        assert!((what & 0xFFF) + 2 < 0x1000);
+        if what & 0x1000 != 0 {
+            let what = (what & 0xFFF) as usize;
+            smash::phx::Vector3f {
+                x: self.fighter_float[what + 0],
+                y: self.fighter_float[what + 1],
+                z: self.fighter_float[what + 2]
+            }
+        } else {
+            let what = (what & 0xFFF) as usize;
+            smash::phx::Vector3f {
+                x: self.common_float[what + 0],
+                y: self.common_float[what + 1],
+                z: self.common_float[what + 2]
+            }
+        }
+    }
+
+    fn _get_vec4(&self, what: i32) -> smash::phx::Vector4f {
+        assert!((what & 0xFFF) + 2 < 0x1000);
+        if what & 0x1000 != 0 {
+            let what = (what & 0xFFF) as usize;
+            smash::phx::Vector4f {
+                x: self.fighter_float[what + 0],
+                y: self.fighter_float[what + 1],
+                z: self.fighter_float[what + 2],
+                w: self.fighter_float[what + 3]
+            }
+        } else {
+            let what = (what & 0xFFF) as usize;
+            smash::phx::Vector4f {
+                x: self.common_float[what + 0],
+                y: self.common_float[what + 1],
+                z: self.common_float[what + 2],
+                w: self.common_float[what + 3]
+            }
+        }
+    }
+
     #[cfg_attr(feature = "debug", export_name = "VarModule__get_int")]
     pub fn get_int(boma: *mut BattleObjectModuleAccessor, what: i32) -> i32 {
         unsafe {
@@ -244,4 +384,91 @@ impl VarModule {
             get_var_module!(boma)._reset(reset_mask);
         }
     }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__add_int")]
+    pub fn add_int(boma: *mut BattleObjectModuleAccessor, what: i32, val: i32) {
+        unsafe {
+            get_var_module!(boma)._add_int(what, val)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__sub_int")]
+    pub fn sub_int(boma: *mut BattleObjectModuleAccessor, what: i32, val: i32) {
+        unsafe {
+            get_var_module!(boma)._sub_int(what, val)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__inc_int")]
+    pub fn inc_int(boma: *mut BattleObjectModuleAccessor, what: i32) {
+        unsafe {
+            get_var_module!(boma)._add_int(what, 1)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__dec_int")]
+    pub fn dec_int(boma: *mut BattleObjectModuleAccessor, what: i32) {
+        unsafe {
+            get_var_module!(boma)._sub_int(what, 1)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__add_float")]
+    pub fn add_float(boma: *mut BattleObjectModuleAccessor, what: i32, val: f32) {
+        unsafe {
+            get_var_module!(boma)._add_float(what, val)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__sub_float")]
+    pub fn sub_float(boma: *mut BattleObjectModuleAccessor, what: i32, val: f32) {
+        unsafe {
+            get_var_module!(boma)._sub_float(what, val)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__set_vec2")]
+    pub fn set_vec2(boma: *mut BattleObjectModuleAccessor, what: i32, vec: &smash::phx::Vector2f) {
+        unsafe {
+            get_var_module!(boma)._set_vec2(what, vec)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__set_vec3")]
+    pub fn set_vec3(boma: *mut BattleObjectModuleAccessor, what: i32, vec: &smash::phx::Vector3f) {
+        unsafe {
+            get_var_module!(boma)._set_vec3(what, vec)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__set_vec4")]
+    pub fn set_vec4(boma: *mut BattleObjectModuleAccessor, what: i32, vec: &smash::phx::Vector4f) {
+        unsafe {
+            get_var_module!(boma)._set_vec4(what, vec)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__get_vec2")]
+    pub fn get_vec2(boma: *mut BattleObjectModuleAccessor, what: i32) -> smash::phx::Vector2f {
+        unsafe {
+            get_var_module!(boma)._get_vec2(what)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__get_vec3")]
+    pub fn get_vec3(boma: *mut BattleObjectModuleAccessor, what: i32) -> smash::phx::Vector3f {
+        unsafe {
+            get_var_module!(boma)._get_vec3(what)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "VarModule__get_vec4")]
+    pub fn get_vec4(boma: *mut BattleObjectModuleAccessor, what: i32) -> smash::phx::Vector4f {
+        unsafe {
+            get_var_module!(boma)._get_vec4(what)
+        }
+    }
+
+
+
 }

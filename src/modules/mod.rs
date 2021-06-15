@@ -3,11 +3,15 @@ use smash::lua2cpp::*;
 use smash::app::BattleObjectModuleAccessor;
 use std::sync::Once;
 
+use crate::debugln;
+
 pub mod anim;
+pub mod meter;
 pub mod param;
 pub mod var;
 
 pub use anim::*;
+pub use meter::*;
 pub use param::*;
 pub use var::*;
 
@@ -28,11 +32,12 @@ pub fn is_hdr_boma(boma: *mut BattleObjectModuleAccessor) -> bool {
 const    OG_VTABLE_OFFSET: isize = 0;
 pub(crate) const   VAR_MODULE_OFFSET: isize = 1;
 pub(crate) const PARAM_MODULE_OFFSET: isize = 2;
+pub(crate) const METER_MODULE_OFFSET: isize = 3;
 
 static INIT: Once = Once::new();
 
 unsafe fn create_vtable_layout(count: isize) -> std::alloc::Layout {
-    std::alloc::Layout::from_size_align(((count + 2 + PARAM_MODULE_OFFSET + 1) * 8) as usize, 0x10).expect("Unable to create vtable layout.")
+    std::alloc::Layout::from_size_align(((count + 2 + METER_MODULE_OFFSET + 1) * 8) as usize, 0x10).expect("Unable to create vtable layout.")
 }
 
 unsafe fn common_dtor(boma: *mut BattleObjectModuleAccessor) {
@@ -43,6 +48,7 @@ unsafe fn common_dtor(boma: *mut BattleObjectModuleAccessor) {
         let og_vtable = *vtable.offset(entry_count + OG_VTABLE_OFFSET) as *const u64;
         drop(Box::from_raw(*vtable.offset(entry_count + VAR_MODULE_OFFSET) as *mut VarModule));
         drop(Box::from_raw(*vtable.offset(entry_count + PARAM_MODULE_OFFSET) as *mut ParamModule));
+        drop(Box::from_raw(*vtable.offset(entry_count + METER_MODULE_OFFSET) as *mut MeterModule));
         vtable = vtable.offset(-2);
         std::alloc::dealloc(vtable as *mut u8, layout);
         *(boma as *mut *const u64) = og_vtable;
@@ -104,13 +110,14 @@ unsafe fn recreate_vtable(boma: *mut BattleObjectModuleAccessor, category: i32, 
         *new_vtable.offset(entry_count + OG_VTABLE_OFFSET) = vtable as u64;
         *new_vtable.offset(entry_count + VAR_MODULE_OFFSET) = Box::into_raw(Box::new(VarModule::new())) as u64;
         *new_vtable.offset(entry_count + PARAM_MODULE_OFFSET) = Box::into_raw(Box::new(ParamModule::new(category, kind))) as u64;
+        *new_vtable.offset(entry_count + METER_MODULE_OFFSET) = Box::into_raw(Box::new(MeterModule::new(30, 10))) as u64;
         *new_vtable.offset(1) = std::mem::transmute(BattleObjectModuleAccessor_destructor as *const extern "C" fn()); // these don't get called sadge
         *new_vtable.offset(2) = std::mem::transmute(BattleObjectModuleAccessor_delete_destructor as *const extern "C" fn()); // these don't get called sadge
         *(boma as *mut *const u64) = new_vtable;
         anim::add_to_module_accessor(boma, kind);
     }
     else {
-        println!("[HDR] BattleObjectModuleAccessor has already been converted -- skipping.");
+        debugln!("[HDR] BattleObjectModuleAccessor has already been converted -- skipping.");
     }
 }
 

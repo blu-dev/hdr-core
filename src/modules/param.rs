@@ -48,6 +48,7 @@ lazy_static! {
     static ref AGENT_FLAG:  RwLock<HashMap<String, Arc<HashMap<u64, bool>>>> = RwLock::new(HashMap::new());
 }
 
+#[derive(Copy, Clone)]
 pub enum ParamType {
     Common,
     Shared,
@@ -476,10 +477,53 @@ impl ParamModule {
         }
     }
 
+    #[cfg_attr(feature = "debug", export_name = "ParamModule__get_hash")]
+    pub fn get_hash(boma: *mut smash::app::BattleObjectModuleAccessor, ty: ParamType, string: &str) -> smash::phx::Hash40 {
+        unsafe {
+            smash::phx::Hash40::new_raw(get_param_module!(boma)._get_int64(ty, smash::phx::Hash40::new(string).hash))
+        }
+    }
+
     #[cfg_attr(feature = "debug", export_name = "ParamModule__get_float")]
     pub fn get_float(boma: *mut smash::app::BattleObjectModuleAccessor, ty: ParamType, string: &str) -> f32 {
         unsafe {
             get_param_module!(boma)._get_float(ty, smash::phx::Hash40::new(string).hash)
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "ParamModule__get_vec2")]
+    pub fn get_vec2(boma: *mut smash::app::BattleObjectModuleAccessor, ty: ParamType, x: &str, y: &str) -> smash::phx::Vector2f {
+        unsafe {
+            let module = get_param_module!(boma);
+            smash::phx::Vector2f {
+                x: module._get_float(ty, smash::phx::Hash40::new(x).hash),
+                y: module._get_float(ty, smash::phx::Hash40::new(y).hash),
+            }
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "ParamModule__get_vec3")]
+    pub fn get_vec3(boma: *mut smash::app::BattleObjectModuleAccessor, ty: ParamType, x: &str, y: &str, z: &str) -> smash::phx::Vector3f {
+        unsafe {
+            let module = get_param_module!(boma);
+            smash::phx::Vector3f {
+                x: module._get_float(ty, smash::phx::Hash40::new(x).hash),
+                y: module._get_float(ty, smash::phx::Hash40::new(y).hash),
+                z: module._get_float(ty, smash::phx::Hash40::new(z).hash)
+            }
+        }
+    }
+
+    #[cfg_attr(feature = "debug", export_name = "ParamModule__get_vec4")]
+    pub fn get_vec4(boma: *mut smash::app::BattleObjectModuleAccessor, ty: ParamType, x: &str, y: &str, z: &str, w: &str) -> smash::phx::Vector4f {
+        unsafe {
+            let module = get_param_module!(boma);
+            smash::phx::Vector4f {
+                x: module._get_float(ty, smash::phx::Hash40::new(x).hash),
+                y: module._get_float(ty, smash::phx::Hash40::new(y).hash),
+                z: module._get_float(ty, smash::phx::Hash40::new(z).hash),
+                w: module._get_float(ty, smash::phx::Hash40::new(w).hash)
+            }
         }
     }
 

@@ -52,6 +52,27 @@ macro_rules! vtable_addr {
     }
 }
 
+#[macro_export]
+macro_rules! zero2 {
+    () => {
+        smash::phx::Vector2f { x: 0.0, y: 0.0 }
+    }
+}
+
+#[macro_export]
+macro_rules! zero3 {
+    () => {
+        smash::phx::Vector3f { x: 0.0, y: 0.0, z: 0.0 }
+    }
+}
+
+#[macro_export]
+macro_rules! zero4 {
+    () => {
+        smash::phx::Vector4f { x: 0.0, y: 0.0, z: 0.0 }
+    }
+}
+
 pub unsafe fn byte_search(needle: &[u32]) -> Option<usize> {
     let mut matching = 0usize;
     let text_start = skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as *const u32;
