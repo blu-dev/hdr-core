@@ -29,7 +29,7 @@ impl MeterModule {
 
     unsafe fn _set_level(&mut self, level: i32) {
         self.level = level.clamp(0, self.max_level);
-        self.internal_count = level_up_count * level;
+        self.internal_count = self.level_up_count * level;
     }
 
     unsafe fn _add_count(&mut self, amount: i32) {
