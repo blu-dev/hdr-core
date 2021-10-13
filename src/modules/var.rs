@@ -1,9 +1,10 @@
 use smash::app::BattleObjectModuleAccessor;
+use std::{any::Any, collections::HashMap};
 use super::VAR_MODULE_OFFSET;
 
 macro_rules! get_var_module {
     ($boma:ident) => {{
-        let vtable = *($boma as *const *const u64);
+        let vtable = *($boma as *mut BattleObjectModuleAccessor as *const *const u64);
         &mut *(*vtable.offset((*vtable.offset(-1) as isize) + VAR_MODULE_OFFSET) as *mut VarModule)
     }}
 }
@@ -19,7 +20,9 @@ pub struct VarModule {
     fighter_int:   [i32; 0x1000],
     fighter_int64: [u64; 0x1000],
     fighter_float: [f32; 0x1000],
-    fighter_flag:  [bool; 0x1000]
+    fighter_flag:  [bool; 0x1000],
+
+    data: HashMap<i32, Box<dyn Any>>
 }
 
 impl VarModule {
@@ -46,7 +49,9 @@ impl VarModule {
             fighter_int: [0; 0x1000],
             fighter_int64: [0; 0x1000],
             fighter_float: [0.0; 0x1000],
-            fighter_flag: [false; 0x1000]
+            fighter_flag: [false; 0x1000],
+
+            data: HashMap::new()
         }
     }
 
@@ -305,6 +310,22 @@ impl VarModule {
         }
     }
 
+    fn _set_data(&mut self, what: i32, data: Box<dyn Any>) {
+        let _ = self.data.insert(what, data);
+    }
+
+    fn _clear_data(&mut self, what: i32) {
+        let _ = self.data.remove(&what);
+    }
+
+    fn _get_data(&self, what: i32) -> Option<&Box<dyn Any>> {
+        self.data.get(&what)
+    }
+
+    fn _get_data_mut(&mut self, what: i32) -> Option<&mut Box<dyn Any>> {
+        self.data.get_mut(&what)
+    }
+
     #[cfg_attr(feature = "debug", export_name = "VarModule__get_int")]
     pub fn get_int(boma: *mut BattleObjectModuleAccessor, what: i32) -> i32 {
         unsafe {
@@ -469,6 +490,43 @@ impl VarModule {
         }
     }
 
+    pub fn set_data<T: Any + 'static>(boma: &mut BattleObjectModuleAccessor, what: i32, gen: impl Fn() -> T) {
+        unsafe {
+            get_var_module!(boma)._set_data(what, Box::new(gen()));
+        }
+    }
 
+    pub fn set_data_raw(boma: &mut BattleObjectModuleAccessor, what: i32, data: Box<dyn Any>) {
+        unsafe {
+            get_var_module!(boma)._set_data(what, data)
+        }
+    }
 
+    pub fn clear_data(boma: &mut BattleObjectModuleAccessor, what: i32) {
+        unsafe {
+            get_var_module!(boma)._clear_data(what);
+        }
+    }
+
+    pub fn get<T: 'static>(boma: &mut BattleObjectModuleAccessor, what: i32) -> Option<&T> {
+        unsafe {
+            get_var_module!(boma)
+                ._get_data(what)
+                .map_or_else(
+                    || None,
+                    |x| x.downcast_ref()
+                )
+        }
+    }
+    
+    pub fn get_mut<T: 'static>(boma: &mut BattleObjectModuleAccessor, what: i32) -> Option<&mut T> {
+        unsafe {
+            get_var_module!(boma)
+                ._get_data_mut(what)
+                .map_or_else(
+                    || None,
+                    |x| x.downcast_mut()
+                )
+        }
+    }
 }

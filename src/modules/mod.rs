@@ -5,12 +5,12 @@ use std::sync::Once;
 
 use crate::debugln;
 
-pub mod anim;
+// pub mod anim;
 pub mod meter;
 pub mod param;
 pub mod var;
 
-pub use anim::*;
+// pub use anim::*;
 pub use meter::*;
 pub use param::*;
 pub use var::*;
@@ -114,7 +114,7 @@ unsafe fn recreate_vtable(boma: *mut BattleObjectModuleAccessor, category: i32, 
         *new_vtable.offset(1) = std::mem::transmute(BattleObjectModuleAccessor_destructor as *const extern "C" fn()); // these don't get called sadge
         *new_vtable.offset(2) = std::mem::transmute(BattleObjectModuleAccessor_delete_destructor as *const extern "C" fn()); // these don't get called sadge
         *(boma as *mut *const u64) = new_vtable;
-        anim::add_to_module_accessor(boma, kind);
+        // anim::add_to_module_accessor(boma, kind);
     }
     else {
         debugln!("[HDR] BattleObjectModuleAccessor has already been converted -- skipping.");
