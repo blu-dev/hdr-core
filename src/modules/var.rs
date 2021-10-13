@@ -490,25 +490,25 @@ impl VarModule {
         }
     }
 
-    pub fn set_data<T: Any + 'static>(boma: &mut BattleObjectModuleAccessor, what: i32, gen: impl Fn() -> T) {
+    pub fn set_data<T: Any + 'static>(boma: *mut BattleObjectModuleAccessor, what: i32, gen: impl Fn() -> T) {
         unsafe {
             get_var_module!(boma)._set_data(what, Box::new(gen()));
         }
     }
 
-    pub fn set_data_raw(boma: &mut BattleObjectModuleAccessor, what: i32, data: Box<dyn Any>) {
+    pub fn set_data_raw(boma: *mut BattleObjectModuleAccessor, what: i32, data: Box<dyn Any>) {
         unsafe {
             get_var_module!(boma)._set_data(what, data)
         }
     }
 
-    pub fn clear_data(boma: &mut BattleObjectModuleAccessor, what: i32) {
+    pub fn clear_data(boma: *mut BattleObjectModuleAccessor, what: i32) {
         unsafe {
             get_var_module!(boma)._clear_data(what);
         }
     }
 
-    pub fn get<T: 'static>(boma: &mut BattleObjectModuleAccessor, what: i32) -> Option<&T> {
+    pub fn get<T: 'static>(boma: *mut BattleObjectModuleAccessor, what: i32) -> Option<&'static T> {
         unsafe {
             get_var_module!(boma)
                 ._get_data(what)
@@ -519,7 +519,7 @@ impl VarModule {
         }
     }
     
-    pub fn get_mut<T: 'static>(boma: &mut BattleObjectModuleAccessor, what: i32) -> Option<&mut T> {
+    pub fn get_mut<T: 'static>(boma: *mut BattleObjectModuleAccessor, what: i32) -> Option<&'static mut T> {
         unsafe {
             get_var_module!(boma)
                 ._get_data_mut(what)
