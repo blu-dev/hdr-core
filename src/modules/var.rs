@@ -327,11 +327,9 @@ impl VarModule {
     }
 
     fn _get_data_or(&mut self, what: i32, data: Box<dyn Any>) -> &mut Box<dyn Any> {
-        if let Some(data) = self.data.get_mut(&what) {
-            data
-        } else {
-            self.data.insert(what, data);
-            self.data.get_mut(&what).unwrap()
+        match self.data.try_insert(what, data) {
+            Ok(val) => val,
+            Err(e) => e.entry.get_mut()
         }
     }
 
