@@ -544,6 +544,7 @@ impl VarModule {
             get_var_module!(boma)
                 ._get_data_or(what, Box::new(gen()))
                 .downcast_mut()
+                .unwrap()
         }
     }
 }
