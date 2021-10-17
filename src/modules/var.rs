@@ -539,7 +539,7 @@ impl VarModule {
         }
     }
 
-    pub fn get_or<T: 'static>(boma: *mut BattleObjectModuleAccessor, what: i32, gen: impl Fn() -> T) -> &mut T {
+    pub fn get_or<T: 'static>(boma: *mut BattleObjectModuleAccessor, what: i32, gen: impl Fn() -> T) -> &'static mut T {
         unsafe {
             get_var_module!(boma)
                 ._get_data_or(what, Box::new(gen()))
