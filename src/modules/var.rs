@@ -327,10 +327,10 @@ impl VarModule {
     }
 
     fn _get_data_or(&mut self, what: i32, data: Box<dyn Any>) -> &mut Box<dyn Any> {
-        match self.data.try_insert(what, data) {
-            Ok(val) => val,
-            Err(e) => e.entry.get_mut()
+        if !self.data.contains_key(&what) {
+            self.data.insert(what, data);
         }
+        self.data.get_mut(&what).unwrap()
     }
 
     #[cfg_attr(feature = "debug", export_name = "VarModule__get_int")]
