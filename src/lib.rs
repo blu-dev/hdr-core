@@ -3,6 +3,7 @@
 #![feature(asm)]
 #![feature(new_uninit)]
 #![feature(vec_into_raw_parts)]
+#![feature(map_try_insert)]
 pub mod fs;
 pub mod modules;
 pub mod singletons;
