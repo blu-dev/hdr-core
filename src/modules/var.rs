@@ -326,6 +326,15 @@ impl VarModule {
         self.data.get_mut(&what)
     }
 
+    fn _get_data_or(&mut self, what: i32, data: Box<dyn Any>) -> &mut Box<dyn Any> {
+        if let Some(data) = self._get_data_mut(what) {
+            data
+        } else {
+            self._set_data(what, data);
+            self._get_data_mut(what).unwrap()
+        }
+    }
+
     #[cfg_attr(feature = "debug", export_name = "VarModule__get_int")]
     pub fn get_int(boma: *mut BattleObjectModuleAccessor, what: i32) -> i32 {
         unsafe {
@@ -527,6 +536,13 @@ impl VarModule {
                     || None,
                     |x| x.downcast_mut()
                 )
+        }
+    }
+
+    pub fn get_or<T: 'static>(boma: *mut BattleObjectModuleAccessor, what: i32, gen: impl Fn() -> T) -> &mut T {
+        unsafe {
+            get_var_module!(boma)
+                ._get_data_or(what, Box::new(gen()))
         }
     }
 }
