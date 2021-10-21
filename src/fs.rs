@@ -124,14 +124,14 @@ pub fn init() {
 pub fn load_associated_files(info: &NroInfo) {
     let file_map = FILE_MAP.lock();
     let name = String::from(info.name);
-    if name == "common" {
-        unsafe {
-            let mut to_add = FILES_TO_ADD.lock();
-            let mut added_files = ADDED_FILES.lock();
-            *added_files = crate::arc_runtime::LoadedTables::add_files(&to_add);
-            to_add.clear();
-        }
-    }
+    // if name == "common" {
+    //     unsafe {
+    //         let mut to_add = FILES_TO_ADD.lock();
+    //         let mut added_files = ADDED_FILES.lock();
+    //         *added_files = crate::arc_runtime::LoadedTables::add_files(&to_add);
+    //         to_add.clear();
+    //     }
+    // }
     if file_map.contains_key(&name) {
         let files = file_map.get(&name).expect("File map does not contain module entry.");
         FILE_MANAGER.queue(files.iter().map(|x| LoadRequest::new(x, handle_load_file)).collect::<Vec<LoadRequest>>().as_slice());
@@ -170,7 +170,5 @@ fn handle_load_file_map(path: String, data: Vec<u8>) {
 fn handle_load_file(path: String, data: Vec<u8>) {
     if path.ends_with(".prc") {
         super::modules::param::ParamModule::handle_param_load(path, data);
-    } else if path.ends_with(".nuanmb") {
-        super::modules::anim::handle_nuanmb_load(path, data);
     }
 }

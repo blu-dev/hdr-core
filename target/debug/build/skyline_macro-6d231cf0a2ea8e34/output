@@ -1,0 +1,1 @@
+cargo:rerun-if-env-changed=SKYLINE_ADD_NRO_HEADER
