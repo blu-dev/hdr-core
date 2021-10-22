@@ -49,23 +49,25 @@ impl CommandFlag {
         self.on_last_frame = 0;
         for (idx, x) in game_held.iter_mut().enumerate() {
             if *x != 0
-            && (self.hold_frame[idx] < press_frame || self.should_hold[idx] || should_hold) {
+            && (self.hold_frame[idx] < press_frame || self.should_hold[idx] || should_hold || *x != 1) {
                 self.hold_frame[idx] += 1;
                 println!("{:#x} | {:#x}", self.hold_frame[idx], press_frame);
                 if self.hold_frame[idx] < press_frame {
                     continue;
                 }
-                if self.should_hold[idx] {
-                    if self.hold_frame_max[idx] != -1 && self.hold_frame_max[idx] < self.hold_frame[idx] {
-                        *x = 0;
-                        self.hold_frame[idx] = 0;
-                        continue;
-                    }
-                } else if should_hold {
-                    if max_hold_frame != -1 && max_hold_frame < self.hold_frame[idx] {
-                        *x = 0;
-                        self.hold_frame[idx] = 0;
-                        continue;
+                if *x == 1 {
+                    if self.should_hold[idx] {
+                        if self.hold_frame_max[idx] != -1 && self.hold_frame_max[idx] < self.hold_frame[idx] {
+                            *x = 0;
+                            self.hold_frame[idx] = 0;
+                            continue;
+                        }
+                    } else if should_hold {
+                        if max_hold_frame != -1 && max_hold_frame < self.hold_frame[idx] {
+                            *x = 0;
+                            self.hold_frame[idx] = 0;
+                            continue;
+                        }
                     }
                 }
                 self.on_last_frame |= 1 << idx;
