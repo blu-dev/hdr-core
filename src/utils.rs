@@ -10,11 +10,11 @@ macro_rules! dump_trace {
 
         let mut lr: *const u64;
         unsafe {
-            asm!("mov $0, x30" : "=r"(lr) : : : "volatile");
+            llvm_asm!("mov $0, x30" : "=r"(lr) : : : "volatile");
         }
         let mut fp: *const u64;
         unsafe {
-            asm!("mov $0, x29" : "=r"(fp) : : : "volatile");
+            llvm_asm!("mov $0, x29" : "=r"(fp) : : : "volatile");
         }
 
         println!("Current LR: {:#X}", (lr as u64));
