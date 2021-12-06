@@ -110,15 +110,11 @@ impl BufferModule {
 
     fn _persist_command_one_with_lifetime(&mut self, category: i32, flag: i32, lifetime: i32) {
         self._persist_command_one(category, flag);
-        self.cats[category as usize].hold_frame_max[(flag & 0x1F) as usize] = unsafe { 
-            lifetime + smash::app::lua_bind::ControlModule::get_command_life_count_max(self.owner) as i32
-        };
+        self.cats[category as usize].hold_frame_max[(flag & 0x1F) as usize] = lifetime;
     }
 
     fn _set_persist_lifetime(&mut self, lifetime: i32) {
-        self.hold_all_frame_max = unsafe {
-            lifetime + smash::app::lua_bind::ControlModule::get_command_life_count_max(self.owner) as i32
-        };
+        self.hold_all_frame_max = lifetime;
     }
 
     fn _enable_persist(&mut self) {
